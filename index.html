@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BPC Admin Dashboard — May 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -27,6 +27,7 @@
     --text: #1A1A1A;
     --muted: #6B6B6B;
     --hint: #9E9E9E;
+    --sidebar-w: 220px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -39,429 +40,420 @@
     overflow-x: hidden;
   }
 
-  /* iPad layout: sidebar + content */
+  /* ── LAYOUT ─────────────────────────────────────────── */
   .layout {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: var(--sidebar-w) 1fr;
     min-height: 100vh;
   }
 
-  /* SIDEBAR */
+  /* ── SIDEBAR ─────────────────────────────────────────── */
   .sidebar {
     background: var(--surface);
     border-right: 1px solid var(--border);
-    padding: 32px 20px;
+    padding: 28px 16px;
     position: sticky;
     top: 0;
     height: 100vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    z-index: 100;
   }
 
-  .logo {
-    margin-bottom: 32px;
-  }
-
-  .logo-mark {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-
+  .logo { margin-bottom: 28px; }
+  .logo-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
   .logo-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--purple);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 34px; height: 34px;
+    background: var(--purple); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
+  .logo-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; color: var(--muted); }
 
-  .logo-icon svg { width: 20px; height: 20px; fill: white; }
-
-  .logo-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.5px;
-  }
-
-  .logo-sub {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.3px;
-  }
-
-  .nav-section {
-    margin-bottom: 8px;
-  }
-
+  .nav-section { margin-bottom: 6px; }
   .nav-label {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--hint);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    padding: 0 8px;
-    margin-bottom: 6px;
-    margin-top: 16px;
+    font-size: 10px; font-weight: 500; color: var(--hint);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 0 8px; margin-bottom: 4px; margin-top: 14px;
   }
 
   .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--muted);
-    font-weight: 400;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px; cursor: pointer;
+    font-size: 13px; color: var(--muted); font-weight: 400;
     transition: all 0.15s ease;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    margin-bottom: 2px;
+    border: none; background: none; width: 100%; text-align: left; margin-bottom: 2px;
   }
-
   .nav-item:hover { background: var(--bg); color: var(--text); }
-
-  .nav-item.active {
-    background: var(--purple-light);
-    color: var(--purple);
-    font-weight: 500;
-  }
-
-  .nav-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    opacity: 0.7;
-  }
-
+  .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 500; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
   .nav-item.active .nav-icon { opacity: 1; }
-
   .nav-badge {
-    margin-left: auto;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 7px;
-    border-radius: 20px;
-    background: var(--red-light);
-    color: var(--red);
+    margin-left: auto; font-size: 10px; font-weight: 500;
+    padding: 2px 6px; border-radius: 20px;
+    background: var(--red-light); color: var(--red); white-space: nowrap;
   }
-
-  .sidebar-footer {
-    margin-top: auto;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-
+  .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
   .report-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--teal);
-    background: var(--teal-light);
-    padding: 6px 12px;
-    border-radius: 20px;
-    width: 100%;
-    justify-content: center;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 500; color: var(--teal);
+    background: var(--teal-light); padding: 6px 12px;
+    border-radius: 20px; width: 100%; justify-content: center;
   }
 
-  /* MAIN CONTENT */
-  .main {
-    padding: 36px 40px;
+  /* ── MOBILE TOPBAR ───────────────────────────────────── */
+  .topbar {
+    display: none;
+    position: sticky; top: 0; z-index: 200;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    align-items: center; justify-content: space-between;
+  }
+  .topbar-logo { display: flex; align-items: center; gap: 8px; }
+  .topbar-logo .logo-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .topbar-logo .logo-icon svg { width: 16px; height: 16px; }
+  .topbar-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .hamburger {
+    background: none; border: none; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    padding: 0;
+  }
+  .hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.25s; }
+
+  /* ── MOBILE DRAWER ───────────────────────────────────── */
+  .drawer-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); z-index: 300; opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .drawer-overlay.open { opacity: 1; }
+  .drawer {
+    position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
+    background: var(--surface); z-index: 400;
+    padding: 24px 16px; display: flex; flex-direction: column;
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
     overflow-y: auto;
   }
+  .drawer.open { left: 0; }
+  .drawer-close {
+    align-self: flex-end; background: none; border: none;
+    cursor: pointer; font-size: 22px; color: var(--muted); padding: 2px 6px; margin-bottom: 8px;
+  }
+
+  /* ── MAIN CONTENT ────────────────────────────────────── */
+  .main { padding: 32px 36px; overflow-y: auto; min-width: 0; }
 
   .section { display: none; }
   .section.active { display: block; }
 
-  /* PAGE HEADER */
+  /* ── PAGE HEADER ─────────────────────────────────────── */
   .page-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 32px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px; gap: 12px; flex-wrap: wrap;
   }
-
   .page-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.8px;
-    line-height: 1.1;
+    font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700;
+    color: var(--text); letter-spacing: -0.8px; line-height: 1.1;
   }
-
-  .page-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
-
+  .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
   .date-chip {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 20px;
-    white-space: nowrap;
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 7px 14px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
 
-  /* METRIC CARDS */
+  /* ── METRIC CARDS ────────────────────────────────────── */
   .metrics-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    margin-bottom: 28px;
+    gap: 10px; margin-bottom: 20px;
   }
-
+  .metrics-grid.col4 { grid-template-columns: repeat(4, 1fr); }
   .metric-card {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 20px 18px;
-    border: 1px solid var(--border);
+    background: var(--surface); border-radius: 14px;
+    padding: 16px 14px; border: 1px solid var(--border);
   }
-
-  .metric-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .metric-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; color: var(--text); line-height: 1; }
-  .metric-unit { font-size: 14px; font-weight: 400; color: var(--muted); }
-  .metric-note { font-size: 11px; color: var(--hint); margin-top: 6px; }
-
+  .metric-label { font-size: 10px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .metric-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+  .metric-unit { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .metric-note { font-size: 11px; color: var(--hint); margin-top: 5px; }
   .metric-card.accent { background: var(--purple); border-color: var(--purple); }
   .metric-card.accent .metric-label { color: rgba(255,255,255,0.7); }
   .metric-card.accent .metric-val { color: white; }
   .metric-card.accent .metric-note { color: rgba(255,255,255,0.6); }
 
-  /* TWO COL GRID */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  /* ── GRID LAYOUTS ────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 
-  /* CARDS */
+  /* ── CARDS ───────────────────────────────────────────── */
   .card {
-    background: var(--surface);
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    padding: 24px;
-    margin-bottom: 16px;
+    background: var(--surface); border-radius: 14px;
+    border: 1px solid var(--border); padding: 20px;
+    margin-bottom: 14px;
   }
-
   .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 20px;
-    letter-spacing: -0.2px;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--text); margin-bottom: 16px; letter-spacing: -0.2px;
   }
 
-  /* RATING BARS */
+  /* ── RATING BARS ─────────────────────────────────────── */
   .rating-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; font-size: 13px; flex-wrap: nowrap;
   }
-
-  .r-label { color: var(--muted); width: 170px; flex-shrink: 0; }
-  .r-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .r-label { color: var(--muted); width: 160px; flex-shrink: 0; font-size: 12px; }
+  .r-track { flex: 1; min-width: 40px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
   .r-fill { height: 8px; border-radius: 4px; transition: width 0.6s ease; }
-  .r-val { font-weight: 600; font-size: 14px; width: 36px; text-align: right; color: var(--text); }
-  .r-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; width: 80px; text-align: center; flex-shrink: 0; }
+  .r-val { font-weight: 600; font-size: 13px; width: 34px; text-align: right; color: var(--text); flex-shrink: 0; }
+  .r-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; width: 74px; text-align: center; flex-shrink: 0; }
   .tag-strong { background: var(--green-light); color: var(--green); }
   .tag-mod { background: var(--amber-light); color: var(--amber); }
   .tag-weak { background: var(--red-light); color: var(--red); }
 
-  /* BAR CHARTS */
+  /* ── BAR CHARTS ──────────────────────────────────────── */
   .bar-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; font-size: 13px;
   }
-
-  .b-label { color: var(--muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .b-track { width: 180px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+  .b-label { color: var(--muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+  .b-track { width: 140px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
   .b-fill { height: 8px; border-radius: 4px; }
-  .b-val { font-weight: 600; color: var(--text); width: 28px; text-align: right; font-size: 13px; flex-shrink: 0; }
+  .b-val { font-weight: 600; color: var(--text); width: 24px; text-align: right; font-size: 13px; flex-shrink: 0; }
 
-  /* TENURE BAR */
-  .tenure-strip {
-    display: flex;
-    height: 12px;
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 16px 0;
-  }
-
+  /* ── TENURE ──────────────────────────────────────────── */
+  .tenure-strip { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 14px 0; }
   .tenure-seg { height: 100%; }
-
-  .legend-wrap { display: flex; flex-wrap: wrap; gap: 12px; }
+  .legend-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
   .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
-  /* PRIORITY ITEMS */
+  /* ── PRIORITY ────────────────────────────────────────── */
   .priority-row {
-    display: flex;
-    gap: 16px;
-    padding: 18px 0;
+    display: flex; gap: 14px; padding: 16px 0;
     border-bottom: 1px solid var(--border);
   }
-
   .priority-row:last-child { border-bottom: none; }
-
   .p-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
     font-family: 'Syne', sans-serif;
   }
-
   .p-num.urgent { background: var(--red-light); color: var(--red); }
   .p-num.important { background: var(--amber-light); color: var(--amber); }
   .p-num.idea { background: var(--purple-light); color: var(--purple); }
   .p-num.watch { background: var(--green-light); color: var(--green); }
-
-  .p-body { flex: 1; }
+  .p-body { flex: 1; min-width: 0; }
   .p-chip {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    padding: 3px 9px;
-    border-radius: 20px;
-    margin-bottom: 8px;
+    display: inline-block; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 3px 8px; border-radius: 20px; margin-bottom: 6px;
   }
-
   .chip-urgent { background: var(--red-light); color: var(--red); }
   .chip-important { background: var(--amber-light); color: var(--amber); }
   .chip-idea { background: var(--purple-light); color: var(--purple); }
   .chip-watch { background: var(--green-light); color: var(--green); }
+  .p-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .p-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .p-action { font-size: 12px; color: var(--purple); font-weight: 500; margin-top: 7px; line-height: 1.5; }
 
-  .p-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-  .p-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .p-action { font-size: 12px; color: var(--purple); font-weight: 500; margin-top: 8px; line-height: 1.5; }
-
-  /* QUOTES */
+  /* ── QUOTES ──────────────────────────────────────────── */
   .quote-block {
-    background: var(--bg);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
+    background: var(--bg); border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 8px;
     border-left: 3px solid var(--purple-mid);
   }
-
   .quote-text { font-size: 13px; color: var(--text); line-height: 1.6; font-style: italic; }
-  .quote-author { font-size: 11px; color: var(--hint); margin-top: 6px; font-weight: 500; }
+  .quote-author { font-size: 11px; color: var(--hint); margin-top: 5px; font-weight: 500; }
 
-  /* CONTACTS */
+  /* ── CONTACTS ────────────────────────────────────────── */
   .contact-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 0; border-bottom: 1px solid var(--border);
   }
-
   .contact-row:last-child { border-bottom: none; }
-
   .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     background: var(--purple-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--purple);
-    flex-shrink: 0;
-    font-family: 'Syne', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--purple);
+    flex-shrink: 0; font-family: 'Syne', sans-serif;
   }
-
   .contact-body { flex: 1; min-width: 0; }
   .contact-name { font-size: 14px; font-weight: 500; color: var(--text); }
   .contact-tenure { font-size: 11px; color: var(--hint); }
-  .contact-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .contact-note { font-size: 12px; color: var(--teal); font-weight: 500; }
+  .contact-detail { font-size: 12px; color: var(--muted); margin-top: 2px; word-break: break-word; }
+  .contact-note { font-size: 12px; color: var(--teal); font-weight: 500; flex-shrink: 0; text-align: right; max-width: 120px; }
 
-  /* FOLLOW UP ROW */
+  /* ── FOLLOW-UP ───────────────────────────────────────── */
   .followup-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 0; border-bottom: 1px solid var(--border);
   }
-
   .followup-row:last-child { border-bottom: none; }
-
   .followup-badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--amber);
-    background: var(--amber-light);
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
+    font-size: 10px; font-weight: 600; color: var(--amber);
+    background: var(--amber-light); padding: 4px 9px;
+    border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
 
-  /* CANVAS WRAPPERS */
+  /* ── CANVAS ──────────────────────────────────────────── */
   .chart-wrap { position: relative; width: 100%; }
 
-  /* FRIENDS / EVENTS MINI STAT */
-  .mini-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-  .mini-stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-  }
-
-  .mini-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 10px; }
-  .mini-donut-label { display: flex; flex-direction: column; gap: 6px; }
-  .donut-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
-  .donut-count { font-weight: 600; color: var(--text); }
-
-  /* ANIMATIONS */
+  /* ── ANIMATIONS ──────────────────────────────────────── */
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .section.active > * { animation: fadeInUp 0.3s ease both; }
   .section.active > *:nth-child(2) { animation-delay: 0.05s; }
   .section.active > *:nth-child(3) { animation-delay: 0.1s; }
   .section.active > *:nth-child(4) { animation-delay: 0.15s; }
 
-  /* SCROLLBAR */
+  /* ── SCROLLBAR ───────────────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ════════════════════════════════════════════════════════
+     RESPONSIVE BREAKPOINTS
+  ════════════════════════════════════════════════════════ */
+
+  /* ── Tablet (≤900px): collapse some columns ──────────── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 190px; }
+    .main { padding: 24px 20px; }
+    .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+    .metrics-grid.col4 { grid-template-columns: repeat(2, 1fr); }
+    .three-col { grid-template-columns: 1fr 1fr; }
+    .r-label { width: 120px; }
+    .b-track { width: 100px; }
+    .contact-note { max-width: 90px; }
+  }
+
+  /* ── Small tablet / large phone (≤680px): hide sidebar, show topbar ── */
+  @media (max-width: 680px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .topbar { display: flex; }
+    .main { padding: 20px 16px; }
+
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .metrics-grid.col4 { grid-template-columns: repeat(2, 1fr); }
+    .metric-val { font-size: 22px; }
+
+    .two-col { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr; }
+
+    .page-title { font-size: 22px; }
+    .page-header { margin-bottom: 20px; }
+
+    .r-label { width: 90px; font-size: 11px; }
+    .r-tag { display: none; }
+    .b-track { width: 80px; }
+
+    /* contacts: stack note below */
+    .contact-row { flex-wrap: wrap; }
+    .contact-note { max-width: 100%; text-align: left; margin-top: 4px; }
+    .followup-row { flex-wrap: wrap; }
+    .followup-badge { margin-top: 6px; }
+
+    /* priority: tighter */
+    .priority-row { gap: 10px; }
+  }
+
+  /* ── Mobile (≤420px): single column everything ───────── */
+  @media (max-width: 420px) {
+    .metrics-grid { grid-template-columns: 1fr 1fr; gap: 7px; }
+    .metric-card { padding: 12px 10px; }
+    .metric-label { font-size: 9px; }
+    .metric-val { font-size: 20px; }
+    .r-label { width: 80px; font-size: 10px; }
+    .card { padding: 14px; }
+    .b-track { width: 60px; }
+  }
+
+  /* ── Quotes responsive grids ─────────────────────────── */
+  .quotes-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .quotes-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 680px) {
+    .quotes-3col { grid-template-columns: 1fr; }
+    .quotes-2col { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
+<!-- ── MOBILE TOPBAR ────────────────────────────────────── -->
+<div class="topbar" id="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="topbar-title">BPC Admin</span>
+  </div>
+  <button class="hamburger" onclick="toggleDrawer()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- ── MOBILE DRAWER ────────────────────────────────────── -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <button class="drawer-close" onclick="toggleDrawer()" aria-label="Close menu">✕</button>
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="logo-text">BPC</span>
+    </div>
+    <div class="logo-sub">Admin Report · May 2026</div>
+  </div>
+  <div class="nav-label">Reports</div>
+  <button class="nav-item active" onclick="showTab('overview', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Overview
+  </button>
+  <button class="nav-item" onclick="showTab('ratings', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Ratings
+  </button>
+  <button class="nav-item" onclick="showTab('events', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Events
+  </button>
+  <button class="nav-item" onclick="showTab('priorities', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Priority actions
+    <span class="nav-badge">3 urgent</span>
+  </button>
+  <div class="nav-label" style="margin-top:14px;">Insights</div>
+  <button class="nav-item" onclick="showTab('voices', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Member voices
+  </button>
+  <button class="nav-item" onclick="showTab('contacts', this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Contacts
+  </button>
+  <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border);">
+    <div class="report-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      30 responses collected
+    </div>
+  </div>
+</nav>
+
 <div class="layout">
 
-  <!-- SIDEBAR -->
+  <!-- ── SIDEBAR (desktop) ──────────────────────────────── -->
   <aside class="sidebar">
     <div class="logo">
       <div class="logo-mark">
@@ -475,19 +467,19 @@
 
     <div class="nav-section">
       <div class="nav-label">Reports</div>
-      <button class="nav-item active" onclick="showTab('overview')">
+      <button class="nav-item active" onclick="showTab('overview', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Overview
       </button>
-      <button class="nav-item" onclick="showTab('ratings')">
+      <button class="nav-item" onclick="showTab('ratings', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Ratings
       </button>
-      <button class="nav-item" onclick="showTab('events')">
+      <button class="nav-item" onclick="showTab('events', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Events
       </button>
-      <button class="nav-item" onclick="showTab('priorities')">
+      <button class="nav-item" onclick="showTab('priorities', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Priority actions
         <span class="nav-badge">3 urgent</span>
@@ -496,11 +488,11 @@
 
     <div class="nav-section">
       <div class="nav-label">Insights</div>
-      <button class="nav-item" onclick="showTab('voices')">
+      <button class="nav-item" onclick="showTab('voices', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Member voices
       </button>
-      <button class="nav-item" onclick="showTab('contacts')">
+      <button class="nav-item" onclick="showTab('contacts', this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Contacts
       </button>
@@ -514,7 +506,7 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- ── MAIN ───────────────────────────────────────────── -->
   <main class="main">
 
     <!-- OVERVIEW -->
@@ -575,7 +567,7 @@
         </div>
         <div class="card">
           <div class="card-title">Activity level</div>
-          <div class="chart-wrap" style="height:180px;">
+          <div class="chart-wrap" style="height:160px;">
             <canvas id="actChart" role="img" aria-label="Activity level: Core 5, Daily 7, Casual 12, Lurker 6"></canvas>
           </div>
         </div>
@@ -595,16 +587,52 @@
       <div class="two-col">
         <div class="card">
           <div class="card-title">Made friends in BPC?</div>
-          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Yes, multiple</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">13</span></div>
-          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Yes, one or two</span><div class="b-track"><div class="b-fill" style="width:85%;background:#1D9E75;"></div></div><span class="b-val">11</span></div>
-          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Warming up</span><div class="b-track"><div class="b-fill" style="width:38%;background:#AFA9EC;"></div></div><span class="b-val">5</span></div>
+          <div class="bar-row" style="margin-bottom:12px;"><span class="b-label">Yes, multiple</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">13</span></div>
+          <div class="bar-row" style="margin-bottom:12px;"><span class="b-label">Yes, one or two</span><div class="b-track"><div class="b-fill" style="width:85%;background:#1D9E75;"></div></div><span class="b-val">11</span></div>
+          <div class="bar-row" style="margin-bottom:12px;"><span class="b-label">Warming up</span><div class="b-track"><div class="b-fill" style="width:38%;background:#AFA9EC;"></div></div><span class="b-val">5</span></div>
           <div class="bar-row"><span class="b-label">Not really</span><div class="b-track"><div class="b-fill" style="width:8%;background:#F0997B;"></div></div><span class="b-val">1</span></div>
         </div>
         <div class="card">
           <div class="card-title">Post frequency feedback</div>
-          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Just right</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
-          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Too little — want more</span><div class="b-track"><div class="b-fill" style="width:24%;background:#534AB7;"></div></div><span class="b-val">5</span></div>
+          <div class="bar-row" style="margin-bottom:12px;"><span class="b-label">Just right</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
+          <div class="bar-row" style="margin-bottom:12px;"><span class="b-label">Too little — want more</span><div class="b-track"><div class="b-fill" style="width:24%;background:#534AB7;"></div></div><span class="b-val">5</span></div>
           <div class="bar-row"><span class="b-label">Too much — overwhelming</span><div class="b-track"><div class="b-fill" style="width:19%;background:#D85A30;"></div></div><span class="b-val">4</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Community experience — all ratings</div>
+        <div class="rating-row"><span class="r-label">Overall vibe</span><div class="r-track"><div class="r-fill" style="width:93.4%;background:#534AB7;"></div></div><span class="r-val">4.67</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">NPS — recommend</span><div class="r-track"><div class="r-fill" style="width:93.4%;background:#534AB7;"></div></div><span class="r-val">4.67</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Admin responsiveness</span><div class="r-track"><div class="r-fill" style="width:91.4%;background:#534AB7;"></div></div><span class="r-val">4.57</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Meme / edit quality</span><div class="r-track"><div class="r-fill" style="width:90.6%;background:#534AB7;"></div></div><span class="r-val">4.53</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Moderation fairness</span><div class="r-track"><div class="r-fill" style="width:90.6%;background:#534AB7;"></div></div><span class="r-val">4.53</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Movies rating</span><div class="r-track"><div class="r-fill" style="width:92%;background:#534AB7;"></div></div><span class="r-val">4.60</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Easy to navigate</span><div class="r-track"><div class="r-fill" style="width:90%;background:#534AB7;"></div></div><span class="r-val">4.50</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Belonging score</span><div class="r-track"><div class="r-fill" style="width:90%;background:#534AB7;"></div></div><span class="r-val">4.50</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Welcome feel</span><div class="r-track"><div class="r-fill" style="width:88%;background:#534AB7;"></div></div><span class="r-val">4.40</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Anime rating</span><div class="r-track"><div class="r-fill" style="width:85.4%;background:#7F77DD;"></div></div><span class="r-val">4.27</span><span class="r-tag tag-mod">Moderate</span></div>
+        <div class="rating-row"><span class="r-label">Gaming rating</span><div class="r-track"><div class="r-fill" style="width:81.4%;background:#BA7517;"></div></div><span class="r-val">4.07</span><span class="r-tag tag-mod">Moderate</span></div>
+        <div class="rating-row"><span class="r-label">Music rating</span><div class="r-track"><div class="r-fill" style="width:76%;background:#D85A30;"></div></div><span class="r-val">3.80</span><span class="r-tag tag-weak">Needs work</span></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">NPS score distribution</div>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="npsChart" role="img" aria-label="NPS: score 3 got 1 vote, score 4 got 8 votes, score 5 got 21 votes"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Key insight</div>
+          <div class="quote-block">
+            <div class="quote-text">21 out of 30 members rated NPS at 5/5 — an exceptional recommendation score showing deep loyalty in the community.</div>
+          </div>
+          <div style="margin-top:10px;">
+            <div class="bar-row"><span class="b-label">Score 5 — Promoters</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
+            <div class="bar-row"><span class="b-label">Score 4 — Satisfied</span><div class="b-track"><div class="b-fill" style="width:38%;background:#534AB7;"></div></div><span class="b-val">8</span></div>
+            <div class="bar-row"><span class="b-label">Score 3 — Neutral</span><div class="b-track"><div class="b-fill" style="width:5%;background:#AFA9EC;"></div></div><span class="b-val">1</span></div>
+          </div>
         </div>
       </div>
     </section>
@@ -619,7 +647,7 @@
         <div class="date-chip">May 2026</div>
       </div>
 
-      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="metrics-grid col4">
         <div class="metric-card accent">
           <div class="metric-label">Avg vibe score</div>
           <div class="metric-val">4.67</div>
@@ -661,20 +689,14 @@
       <div class="two-col">
         <div class="card">
           <div class="card-title">NPS score distribution</div>
-          <div class="chart-wrap" style="height:200px;">
-            <canvas id="npsChart" role="img" aria-label="NPS: score 3 got 1 vote, score 4 got 8 votes, score 5 got 21 votes"></canvas>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="npsChart2" role="img" aria-label="NPS distribution"></canvas>
           </div>
         </div>
         <div class="card">
-          <div class="card-title">Key insight</div>
-          <div class="quote-block">
-            <div class="quote-text">21 out of 30 members rated NPS at 5/5 — an exceptional recommendation score showing deep loyalty in the community.</div>
-          </div>
-          <div style="margin-top:12px;">
-            <div class="bar-row"><span class="b-label">Score 5 — Promoters</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
-            <div class="bar-row"><span class="b-label">Score 4 — Satisfied</span><div class="b-track"><div class="b-fill" style="width:38%;background:#534AB7;"></div></div><span class="b-val">8</span></div>
-            <div class="bar-row"><span class="b-label">Score 3 — Neutral</span><div class="b-track"><div class="b-fill" style="width:5%;background:#AFA9EC;"></div></div><span class="b-val">1</span></div>
-          </div>
+          <div class="card-title">What members think about music</div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">Music avg 3.80/5. Members want City Pop, KPop, South cinema, KDrama, manga, regional Odia films.</div></div>
+          <div class="quote-block"><div class="quote-text">Weekly music &amp; anime discussion thread needed — monthly creator spotlight would help.</div></div>
         </div>
       </div>
     </section>
@@ -683,13 +705,13 @@
     <section class="section" id="tab-events">
       <div class="page-header">
         <div>
-          <div class="page-title">Events & Content</div>
+          <div class="page-title">Events &amp; Content</div>
           <div class="page-subtitle">What members want most</div>
         </div>
         <div class="date-chip">May 2026</div>
       </div>
 
-      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="metrics-grid col4">
         <div class="metric-card accent">
           <div class="metric-label">Movie screenings</div>
           <div class="metric-val">25</div>
@@ -727,10 +749,10 @@
         </div>
         <div class="card">
           <div class="card-title">Event attendance status</div>
-          <div class="chart-wrap" style="height:220px;">
+          <div class="chart-wrap" style="height:200px;">
             <canvas id="attChart" role="img" aria-label="Attendance breakdown"></canvas>
           </div>
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
             <div class="legend-item"><div class="legend-dot" style="background:#534AB7;"></div>Want to attend — 14</div>
             <div class="legend-item"><div class="legend-dot" style="background:#1D9E75;"></div>Attended once — 9</div>
             <div class="legend-item"><div class="legend-dot" style="background:#EEEDFE;border:1px solid #AFA9EC;"></div>Didn't know — 4</div>
@@ -741,7 +763,7 @@
 
       <div class="card">
         <div class="card-title">Specific ideas from members</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="quotes-2col">
           <div class="quote-block"><div class="quote-text">Jamming sessions near Bindusagar</div><div class="quote-author">— Swayaanshu Sarangi, OG member</div></div>
           <div class="quote-block"><div class="quote-text">BPC Awards event — funniest member, most chronically online, best music taste</div><div class="quote-author">— Kinjal, just joined</div></div>
           <div class="quote-block"><div class="quote-text">BPC football match — it's World Cup time!</div><div class="quote-author">— Priyanshu Saini, OG member</div></div>
@@ -897,7 +919,7 @@
 
       <div class="card">
         <div class="card-title">What would make members contribute more?</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="quotes-3col">
           <div class="quote-block"><div class="quote-text">To talk more about Bollywood films, Indian influencers and all.</div><div class="quote-author">— Abhijeet Agrawal</div></div>
           <div class="quote-block"><div class="quote-text">Inclusion. No one has asked me for anything so far.</div><div class="quote-author">— Pidy Piccaso</div></div>
           <div class="quote-block"><div class="quote-text">More interactive events and conversations where newer members can jump in easily.</div><div class="quote-author">— Kinjal</div></div>
@@ -909,7 +931,7 @@
 
       <div class="card">
         <div class="card-title">Wild ideas &amp; rants</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="quotes-2col">
           <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Start streaming in Twitch and YT the Minecraft thing — like Chaos Club (YT channel).</div><div class="quote-author">— Punyashlok Praharaj</div></div>
           <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Host a Ronaldo vs Messi and RCB vs CSK debate competition.</div><div class="quote-author">— Purvansh</div></div>
           <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Collab with OAC.</div><div class="quote-author">— Batman, OG member</div></div>
@@ -1075,7 +1097,7 @@
           <div class="followup-badge">Reach via group</div>
         </div>
 
-        <div style="margin-top:16px;padding:12px 16px;background:#EEEDFE;border-radius:10px;font-size:12px;color:#3C3489;">
+        <div style="margin-top:14px;padding:12px 14px;background:#EEEDFE;border-radius:10px;font-size:12px;color:#3C3489;">
           <strong>Privacy tip:</strong> Always confirm with members before sharing details externally. Phone numbers were voluntarily submitted via the form.
         </div>
       </div>
@@ -1085,94 +1107,122 @@
 </div>
 
 <script>
-function showTab(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  /* ── TAB SWITCHING ──────────────────────────────────────── */
+  function showTab(id, clickedBtn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
 
-  if (id === 'overview') drawActChart();
-  if (id === 'ratings') drawNpsChart();
-  if (id === 'events') drawAttChart();
-}
+    // mark both sidebar + drawer buttons active
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + id + "'")) {
+        btn.classList.add('active');
+      }
+    });
 
-const chartDefaults = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y } } }
-};
+    if (id === 'overview' || id === 'ratings') drawNpsChart();
+    if (id === 'overview') drawActChart();
+    if (id === 'events') drawAttChart();
+    if (id === 'ratings') drawNpsChart2();
 
-let actDrawn = false;
-function drawActChart() {
-  if (actDrawn) return; actDrawn = true;
-  new Chart(document.getElementById('actChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Core member', 'Regular (daily)', 'Casual (few/wk)', 'Lurker'],
-      datasets: [{
-        data: [5, 7, 12, 6],
-        backgroundColor: ['#534AB7', '#7F77DD', '#AFA9EC', '#CECBF6'],
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
+    closeDrawer();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── DRAWER ─────────────────────────────────────────────── */
+  function toggleDrawer() {
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+      closeDrawer();
+    } else {
+      drawer.classList.add('open');
+      overlay.style.display = 'block';
+      setTimeout(() => overlay.classList.add('open'), 10);
+    }
+  }
+  function closeDrawer() {
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    setTimeout(() => overlay.style.display = 'none', 250);
+  }
+
+  /* ── CHARTS ─────────────────────────────────────────────── */
+  const chartDefaults = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y } } }
+  };
+
+  let actDrawn = false;
+  function drawActChart() {
+    if (actDrawn) return; actDrawn = true;
+    new Chart(document.getElementById('actChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Core member', 'Regular (daily)', 'Casual (few/wk)', 'Lurker'],
+        datasets: [{ data: [5, 7, 12, 6], backgroundColor: ['#534AB7','#7F77DD','#AFA9EC','#CECBF6'], borderRadius: 6, borderSkipped: false }]
+      },
+      options: { ...chartDefaults, scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Sans' }, color: '#6B6B6B', maxRotation: 30 } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 3, font: { size: 10 }, color: '#6B6B6B' }, beginAtZero: true, max: 14 }
+      }}
+    });
+  }
+
+  let npsDrawn = false;
+  function drawNpsChart() {
+    if (npsDrawn) return; npsDrawn = true;
+    const el = document.getElementById('npsChart');
+    if (!el) return;
+    new Chart(el, {
+      type: 'bar',
+      data: {
+        labels: ['Score 1', 'Score 2', 'Score 3', 'Score 4', 'Score 5'],
+        datasets: [{ data: [0, 0, 1, 8, 21], backgroundColor: ['#FCEBEB','#F7C1C1','#CECBF6','#7F77DD','#534AB7'], borderRadius: 6, borderSkipped: false }]
+      },
+      options: { ...chartDefaults, scales: {
         x: { grid: { display: false }, ticks: { font: { size: 11, family: 'DM Sans' }, color: '#6B6B6B' } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 3, font: { size: 11 }, color: '#6B6B6B' }, beginAtZero: true, max: 14 }
-      }
-    }
-  });
-}
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 5, font: { size: 10 }, color: '#6B6B6B' }, beginAtZero: true, max: 25 }
+      }}
+    });
+  }
 
-let npsDrawn = false;
-function drawNpsChart() {
-  if (npsDrawn) return; npsDrawn = true;
-  new Chart(document.getElementById('npsChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Score 1', 'Score 2', 'Score 3', 'Score 4', 'Score 5'],
-      datasets: [{
-        data: [0, 0, 1, 8, 21],
-        backgroundColor: ['#FCEBEB', '#F7C1C1', '#CECBF6', '#7F77DD', '#534AB7'],
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 12, family: 'DM Sans' }, color: '#6B6B6B' } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 5, font: { size: 11 }, color: '#6B6B6B' }, beginAtZero: true, max: 25 }
-      }
-    }
-  });
-}
+  let nps2Drawn = false;
+  function drawNpsChart2() {
+    if (nps2Drawn) return; nps2Drawn = true;
+    const el = document.getElementById('npsChart2');
+    if (!el) return;
+    new Chart(el, {
+      type: 'bar',
+      data: {
+        labels: ['Score 1', 'Score 2', 'Score 3', 'Score 4', 'Score 5'],
+        datasets: [{ data: [0, 0, 1, 8, 21], backgroundColor: ['#FCEBEB','#F7C1C1','#CECBF6','#7F77DD','#534AB7'], borderRadius: 6, borderSkipped: false }]
+      },
+      options: { ...chartDefaults, scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11, family: 'DM Sans' }, color: '#6B6B6B' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 5, font: { size: 10 }, color: '#6B6B6B' }, beginAtZero: true, max: 25 }
+      }}
+    });
+  }
 
-let attDrawn = false;
-function drawAttChart() {
-  if (attDrawn) return; attDrawn = true;
-  new Chart(document.getElementById('attChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Want to (not yet)', 'Attended once', 'Didn\'t know events existed', 'Attended multiple'],
-      datasets: [{
-        data: [14, 9, 4, 3],
-        backgroundColor: ['#534AB7', '#1D9E75', '#EEEDFE', '#AFA9EC'],
-        borderWidth: 2,
-        borderColor: '#ffffff'
-      }]
-    },
-    options: {
-      ...chartDefaults,
-      cutout: '65%',
-      plugins: { legend: { display: false } }
-    }
-  });
-}
+  let attDrawn = false;
+  function drawAttChart() {
+    if (attDrawn) return; attDrawn = true;
+    new Chart(document.getElementById('attChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Want to (not yet)', 'Attended once', 'Didn\'t know events existed', 'Attended multiple'],
+        datasets: [{ data: [14, 9, 4, 3], backgroundColor: ['#534AB7','#1D9E75','#EEEDFE','#AFA9EC'], borderWidth: 2, borderColor: '#ffffff' }]
+      },
+      options: { ...chartDefaults, cutout: '65%', plugins: { legend: { display: false } } }
+    });
+  }
 
-drawActChart();
+  // Draw initial chart
+  drawActChart();
 </script>
 </body>
 </html>
