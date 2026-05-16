@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BPC Admin Dashboard — May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --purple: #534AB7;
+    --purple-light: #EEEDFE;
+    --purple-mid: #AFA9EC;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --hint: #9E9E9E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* iPad layout: sidebar + content */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo {
+    margin-bottom: 32px;
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--purple);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+
+  .nav-section {
+    margin-bottom: 8px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--hint);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 0 8px;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+    transition: all 0.15s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--purple-light);
+    color: var(--purple);
+    font-weight: 500;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .nav-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--red-light);
+    color: var(--red);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .report-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 6px 12px;
+    border-radius: 20px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 36px 40px;
+    overflow-y: auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+
+  .page-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  .date-chip {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* METRIC CARDS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 20px 18px;
+    border: 1px solid var(--border);
+  }
+
+  .metric-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .metric-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; color: var(--text); line-height: 1; }
+  .metric-unit { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .metric-note { font-size: 11px; color: var(--hint); margin-top: 6px; }
+
+  .metric-card.accent { background: var(--purple); border-color: var(--purple); }
+  .metric-card.accent .metric-label { color: rgba(255,255,255,0.7); }
+  .metric-card.accent .metric-val { color: white; }
+  .metric-card.accent .metric-note { color: rgba(255,255,255,0.6); }
+
+  /* TWO COL GRID */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    letter-spacing: -0.2px;
+  }
+
+  /* RATING BARS */
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  .r-label { color: var(--muted); width: 170px; flex-shrink: 0; }
+  .r-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .r-fill { height: 8px; border-radius: 4px; transition: width 0.6s ease; }
+  .r-val { font-weight: 600; font-size: 14px; width: 36px; text-align: right; color: var(--text); }
+  .r-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; width: 80px; text-align: center; flex-shrink: 0; }
+  .tag-strong { background: var(--green-light); color: var(--green); }
+  .tag-mod { background: var(--amber-light); color: var(--amber); }
+  .tag-weak { background: var(--red-light); color: var(--red); }
+
+  /* BAR CHARTS */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .b-label { color: var(--muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .b-track { width: 180px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+  .b-fill { height: 8px; border-radius: 4px; }
+  .b-val { font-weight: 600; color: var(--text); width: 28px; text-align: right; font-size: 13px; flex-shrink: 0; }
+
+  /* TENURE BAR */
+  .tenure-strip {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .tenure-seg { height: 100%; }
+
+  .legend-wrap { display: flex; flex-wrap: wrap; gap: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* PRIORITY ITEMS */
+  .priority-row {
+    display: flex;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .priority-row:last-child { border-bottom: none; }
+
+  .p-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .p-num.urgent { background: var(--red-light); color: var(--red); }
+  .p-num.important { background: var(--amber-light); color: var(--amber); }
+  .p-num.idea { background: var(--purple-light); color: var(--purple); }
+  .p-num.watch { background: var(--green-light); color: var(--green); }
+
+  .p-body { flex: 1; }
+  .p-chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  .chip-urgent { background: var(--red-light); color: var(--red); }
+  .chip-important { background: var(--amber-light); color: var(--amber); }
+  .chip-idea { background: var(--purple-light); color: var(--purple); }
+  .chip-watch { background: var(--green-light); color: var(--green); }
+
+  .p-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .p-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .p-action { font-size: 12px; color: var(--purple); font-weight: 500; margin-top: 8px; line-height: 1.5; }
+
+  /* QUOTES */
+  .quote-block {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--purple-mid);
+  }
+
+  .quote-text { font-size: 13px; color: var(--text); line-height: 1.6; font-style: italic; }
+  .quote-author { font-size: 11px; color: var(--hint); margin-top: 6px; font-weight: 500; }
+
+  /* CONTACTS */
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .contact-row:last-child { border-bottom: none; }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--purple-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--purple);
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .contact-body { flex: 1; min-width: 0; }
+  .contact-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .contact-tenure { font-size: 11px; color: var(--hint); }
+  .contact-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .contact-note { font-size: 12px; color: var(--teal); font-weight: 500; }
+
+  /* FOLLOW UP ROW */
+  .followup-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .followup-row:last-child { border-bottom: none; }
+
+  .followup-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--amber);
+    background: var(--amber-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* CANVAS WRAPPERS */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* FRIENDS / EVENTS MINI STAT */
+  .mini-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .mini-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .mini-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 10px; }
+  .mini-donut-label { display: flex; flex-direction: column; gap: 6px; }
+  .donut-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
+  .donut-count { font-weight: 600; color: var(--text); }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section.active > * { animation: fadeInUp 0.3s ease both; }
+  .section.active > *:nth-child(2) { animation-delay: 0.05s; }
+  .section.active > *:nth-child(3) { animation-delay: 0.1s; }
+  .section.active > *:nth-child(4) { animation-delay: 0.15s; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="logo-text">BPC</span>
+      </div>
+      <div class="logo-sub">Admin Report · May 2026</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Reports</div>
+      <button class="nav-item active" onclick="showTab('overview')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" onclick="showTab('ratings')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Ratings
+      </button>
+      <button class="nav-item" onclick="showTab('events')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Events
+      </button>
+      <button class="nav-item" onclick="showTab('priorities')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Priority actions
+        <span class="nav-badge">3 urgent</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Insights</div>
+      <button class="nav-item" onclick="showTab('voices')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Member voices
+      </button>
+      <button class="nav-item" onclick="showTab('contacts')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Contacts
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="report-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        30 responses collected
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="section active" id="tab-overview">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Community Overview</div>
+          <div class="page-subtitle">Bhubaneswar Pop Culture · Feedback Report</div>
+        </div>
+        <div class="date-chip">May 2026 · 30 responses</div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">Overall vibe</div>
+          <div class="metric-val">4.67<span class="metric-unit">/5</span></div>
+          <div class="metric-note">Highest rated metric</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">NPS score</div>
+          <div class="metric-val">4.67<span class="metric-unit">/5</span></div>
+          <div class="metric-note">Excellent advocacy</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Made friends</div>
+          <div class="metric-val">80<span class="metric-unit">%</span></div>
+          <div class="metric-note">24 of 30 members</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">OG members</div>
+          <div class="metric-val">53<span class="metric-unit">%</span></div>
+          <div class="metric-note">6+ months tenure</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Post frequency</div>
+          <div class="metric-val">70<span class="metric-unit">%</span></div>
+          <div class="metric-note">Say "just right"</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Member tenure breakdown</div>
+          <div class="tenure-strip">
+            <div class="tenure-seg" style="width:53%;background:#534AB7;"></div>
+            <div class="tenure-seg" style="width:17%;background:#7F77DD;"></div>
+            <div class="tenure-seg" style="width:13%;background:#AFA9EC;"></div>
+            <div class="tenure-seg" style="width:10%;background:#CECBF6;"></div>
+            <div class="tenure-seg" style="width:7%;background:#EEEDFE;border-right:1px solid #AFA9EC;"></div>
+          </div>
+          <div class="legend-wrap">
+            <div class="legend-item"><div class="legend-dot" style="background:#534AB7;"></div>OG 6+ mo — 53%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7F77DD;"></div>1–3 mo — 17%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#AFA9EC;"></div>2wk–1mo — 13%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#CECBF6;"></div>3–6 mo — 10%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EEEDFE;border:1px solid #AFA9EC;"></div>Just joined — 7%</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Activity level</div>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="actChart" role="img" aria-label="Activity level: Core 5, Daily 7, Casual 12, Lurker 6"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Top fandom corners (multi-select, 30 members)</div>
+        <div class="bar-row"><span class="b-label">Movies / Cinema</span><div class="b-track"><div class="b-fill" style="width:100%;background:#534AB7;"></div></div><span class="b-val">21</span></div>
+        <div class="bar-row"><span class="b-label">Memes &amp; general vibe</span><div class="b-track"><div class="b-fill" style="width:76%;background:#534AB7;"></div></div><span class="b-val">16</span></div>
+        <div class="bar-row"><span class="b-label">Gaming</span><div class="b-track"><div class="b-fill" style="width:71%;background:#534AB7;"></div></div><span class="b-val">15</span></div>
+        <div class="bar-row"><span class="b-label">All of it equally</span><div class="b-track"><div class="b-fill" style="width:62%;background:#7F77DD;"></div></div><span class="b-val">13</span></div>
+        <div class="bar-row"><span class="b-label">Anime / Manga</span><div class="b-track"><div class="b-fill" style="width:48%;background:#7F77DD;"></div></div><span class="b-val">10</span></div>
+        <div class="bar-row"><span class="b-label">Music</span><div class="b-track"><div class="b-fill" style="width:48%;background:#AFA9EC;"></div></div><span class="b-val">10</span></div>
+        <div class="bar-row"><span class="b-label">Events &amp; meetups</span><div class="b-track"><div class="b-fill" style="width:38%;background:#AFA9EC;"></div></div><span class="b-val">8</span></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Made friends in BPC?</div>
+          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Yes, multiple</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">13</span></div>
+          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Yes, one or two</span><div class="b-track"><div class="b-fill" style="width:85%;background:#1D9E75;"></div></div><span class="b-val">11</span></div>
+          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Warming up</span><div class="b-track"><div class="b-fill" style="width:38%;background:#AFA9EC;"></div></div><span class="b-val">5</span></div>
+          <div class="bar-row"><span class="b-label">Not really</span><div class="b-track"><div class="b-fill" style="width:8%;background:#F0997B;"></div></div><span class="b-val">1</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Post frequency feedback</div>
+          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Just right</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
+          <div class="bar-row" style="margin-bottom:14px;"><span class="b-label">Too little — want more</span><div class="b-track"><div class="b-fill" style="width:24%;background:#534AB7;"></div></div><span class="b-val">5</span></div>
+          <div class="bar-row"><span class="b-label">Too much — overwhelming</span><div class="b-track"><div class="b-fill" style="width:19%;background:#D85A30;"></div></div><span class="b-val">4</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RATINGS -->
+    <section class="section" id="tab-ratings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Rating Scores</div>
+          <div class="page-subtitle">All categories rated out of 5</div>
+        </div>
+        <div class="date-chip">May 2026</div>
+      </div>
+
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric-card accent">
+          <div class="metric-label">Avg vibe score</div>
+          <div class="metric-val">4.67</div>
+          <div class="metric-note">Highest rated</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Admin response</div>
+          <div class="metric-val">4.57</div>
+          <div class="metric-note">Very strong</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Music rating</div>
+          <div class="metric-val" style="color:#A32D2D;">3.80</div>
+          <div class="metric-note">Needs attention</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Gaming rating</div>
+          <div class="metric-val" style="color:#BA7517;">4.07</div>
+          <div class="metric-note">Moderate</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Community experience — all ratings</div>
+        <div class="rating-row"><span class="r-label">Overall vibe</span><div class="r-track"><div class="r-fill" style="width:93.4%;background:#534AB7;"></div></div><span class="r-val">4.67</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">NPS — recommend</span><div class="r-track"><div class="r-fill" style="width:93.4%;background:#534AB7;"></div></div><span class="r-val">4.67</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Admin responsiveness</span><div class="r-track"><div class="r-fill" style="width:91.4%;background:#534AB7;"></div></div><span class="r-val">4.57</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Meme / edit quality</span><div class="r-track"><div class="r-fill" style="width:90.6%;background:#534AB7;"></div></div><span class="r-val">4.53</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Moderation fairness</span><div class="r-track"><div class="r-fill" style="width:90.6%;background:#534AB7;"></div></div><span class="r-val">4.53</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Movies rating</span><div class="r-track"><div class="r-fill" style="width:92%;background:#534AB7;"></div></div><span class="r-val">4.60</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Easy to navigate</span><div class="r-track"><div class="r-fill" style="width:90%;background:#534AB7;"></div></div><span class="r-val">4.50</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Belonging score</span><div class="r-track"><div class="r-fill" style="width:90%;background:#534AB7;"></div></div><span class="r-val">4.50</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Welcome feel</span><div class="r-track"><div class="r-fill" style="width:88%;background:#534AB7;"></div></div><span class="r-val">4.40</span><span class="r-tag tag-strong">Strong</span></div>
+        <div class="rating-row"><span class="r-label">Anime rating</span><div class="r-track"><div class="r-fill" style="width:85.4%;background:#7F77DD;"></div></div><span class="r-val">4.27</span><span class="r-tag tag-mod">Moderate</span></div>
+        <div class="rating-row"><span class="r-label">Gaming rating</span><div class="r-track"><div class="r-fill" style="width:81.4%;background:#BA7517;"></div></div><span class="r-val">4.07</span><span class="r-tag tag-mod">Moderate</span></div>
+        <div class="rating-row"><span class="r-label">Music rating</span><div class="r-track"><div class="r-fill" style="width:76%;background:#D85A30;"></div></div><span class="r-val">3.80</span><span class="r-tag tag-weak">Needs work</span></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">NPS score distribution</div>
+          <div class="chart-wrap" style="height:200px;">
+            <canvas id="npsChart" role="img" aria-label="NPS: score 3 got 1 vote, score 4 got 8 votes, score 5 got 21 votes"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Key insight</div>
+          <div class="quote-block">
+            <div class="quote-text">21 out of 30 members rated NPS at 5/5 — an exceptional recommendation score showing deep loyalty in the community.</div>
+          </div>
+          <div style="margin-top:12px;">
+            <div class="bar-row"><span class="b-label">Score 5 — Promoters</span><div class="b-track"><div class="b-fill" style="width:100%;background:#1D9E75;"></div></div><span class="b-val">21</span></div>
+            <div class="bar-row"><span class="b-label">Score 4 — Satisfied</span><div class="b-track"><div class="b-fill" style="width:38%;background:#534AB7;"></div></div><span class="b-val">8</span></div>
+            <div class="bar-row"><span class="b-label">Score 3 — Neutral</span><div class="b-track"><div class="b-fill" style="width:5%;background:#AFA9EC;"></div></div><span class="b-val">1</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="section" id="tab-events">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Events & Content</div>
+          <div class="page-subtitle">What members want most</div>
+        </div>
+        <div class="date-chip">May 2026</div>
+      </div>
+
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric-card accent">
+          <div class="metric-label">Movie screenings</div>
+          <div class="metric-val">25</div>
+          <div class="metric-note">Most wanted event</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Want events</div>
+          <div class="metric-val">47<span class="metric-unit">%</span></div>
+          <div class="metric-note">Haven't attended yet</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Didn't know</div>
+          <div class="metric-val">4</div>
+          <div class="metric-note">Events existed</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Attended multiple</div>
+          <div class="metric-val">3</div>
+          <div class="metric-note">Members</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Event types wanted (votes)</div>
+          <div class="bar-row"><span class="b-label">Movie screenings</span><div class="b-track"><div class="b-fill" style="width:100%;background:#534AB7;"></div></div><span class="b-val">25</span></div>
+          <div class="bar-row"><span class="b-label">Casual hangouts / chai meetups</span><div class="b-track"><div class="b-fill" style="width:96%;background:#534AB7;"></div></div><span class="b-val">24</span></div>
+          <div class="bar-row"><span class="b-label">Gaming tournaments / LAN</span><div class="b-track"><div class="b-fill" style="width:84%;background:#534AB7;"></div></div><span class="b-val">21</span></div>
+          <div class="bar-row"><span class="b-label">Workshops (editing, art, music)</span><div class="b-track"><div class="b-fill" style="width:80%;background:#7F77DD;"></div></div><span class="b-val">20</span></div>
+          <div class="bar-row"><span class="b-label">Meme contests / edit battles</span><div class="b-track"><div class="b-fill" style="width:72%;background:#7F77DD;"></div></div><span class="b-val">18</span></div>
+          <div class="bar-row"><span class="b-label">Quiz nights (pop culture trivia)</span><div class="b-track"><div class="b-fill" style="width:68%;background:#7F77DD;"></div></div><span class="b-val">17</span></div>
+          <div class="bar-row"><span class="b-label">Anime watch parties</span><div class="b-track"><div class="b-fill" style="width:64%;background:#AFA9EC;"></div></div><span class="b-val">16</span></div>
+          <div class="bar-row"><span class="b-label">Music / open mic nights</span><div class="b-track"><div class="b-fill" style="width:56%;background:#AFA9EC;"></div></div><span class="b-val">14</span></div>
+          <div class="bar-row"><span class="b-label">Cosplay meetups</span><div class="b-track"><div class="b-fill" style="width:52%;background:#AFA9EC;"></div></div><span class="b-val">13</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Event attendance status</div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="attChart" role="img" aria-label="Attendance breakdown"></canvas>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="legend-item"><div class="legend-dot" style="background:#534AB7;"></div>Want to attend — 14</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75;"></div>Attended once — 9</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EEEDFE;border:1px solid #AFA9EC;"></div>Didn't know — 4</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#AFA9EC;"></div>Multiple — 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Specific ideas from members</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="quote-block"><div class="quote-text">Jamming sessions near Bindusagar</div><div class="quote-author">— Swayaanshu Sarangi, OG member</div></div>
+          <div class="quote-block"><div class="quote-text">BPC Awards event — funniest member, most chronically online, best music taste</div><div class="quote-author">— Kinjal, just joined</div></div>
+          <div class="quote-block"><div class="quote-text">BPC football match — it's World Cup time!</div><div class="quote-author">— Priyanshu Saini, OG member</div></div>
+          <div class="quote-block"><div class="quote-text">Monthly quiz/contest with Discord badge designations for winners</div><div class="quote-author">— Priyam Das, 3–6 months</div></div>
+          <div class="quote-block"><div class="quote-text">Cosplay workshop — Odisha mein koi cosplay nahi karta!</div><div class="quote-author">— Pupu, OG member</div></div>
+          <div class="quote-block"><div class="quote-text">A meet-up + Open Mic stand-up exclusive for all BPC members</div><div class="quote-author">— Sai Prem, 1–3 months</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRIORITIES -->
+    <section class="section" id="tab-priorities">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Priority Actions</div>
+          <div class="page-subtitle">12 action items · 3 urgent · 3 important · 4 ideas · 2 watch</div>
+        </div>
+        <div class="date-chip">Admin action needed</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Urgent — act now</div>
+        <div class="priority-row">
+          <div class="p-num urgent">1</div>
+          <div class="p-body">
+            <span class="p-chip chip-urgent">Urgent</span>
+            <div class="p-title">Event awareness gap</div>
+            <div class="p-desc">10 of 30 members said "I didn't know there were events." Swayaanshu, Rishi, Kinjal all flagged this. Large chunk of BPC is missing every event.</div>
+            <div class="p-action">→ Pin event post every week · Add event calendar to group bio · DM blast 24h before each event</div>
+          </div>
+        </div>
+        <div class="priority-row">
+          <div class="p-num urgent">2</div>
+          <div class="p-body">
+            <span class="p-chip chip-urgent">Urgent</span>
+            <div class="p-title">New members feel dropped after welcome</div>
+            <div class="p-desc">Light Yagami: "At first everything is good — then they pretend like I didn't exist." Kinjal: "Making newer members feel included faster 😭"</div>
+            <div class="p-action">→ Assign OG buddy-mentors to new members for 2 weeks · Create #new-members channel with weekly icebreaker · Ask new members directly about their fandom interests</div>
+          </div>
+        </div>
+        <div class="priority-row">
+          <div class="p-num urgent">3</div>
+          <div class="p-body">
+            <span class="p-chip chip-urgent">Urgent</span>
+            <div class="p-title">Toxic infiltration after OAC collab</div>
+            <div class="p-desc">Pupu: "Jab OAC ke sath colab kia, kuchh toxic bande grp me ghus gaye hain." Vetting gaps exposed during the OAC collaboration batch.</div>
+            <div class="p-action">→ Set vetting/intro for external collab batches · Review OAC-era member list · Enforce intro post before full group access</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Important — act this month</div>
+        <div class="priority-row">
+          <div class="p-num important">4</div>
+          <div class="p-body">
+            <span class="p-chip chip-important">Important</span>
+            <div class="p-title">Music &amp; anime content underserved</div>
+            <div class="p-desc">Music avg 3.80/5 · Anime avg 4.27/5. Members want City Pop, KPop, South cinema, KDrama, manga, regional Odia films.</div>
+            <div class="p-action">→ Weekly music &amp; anime discussion thread · Monthly creator spotlight · Odia &amp; South Indian film features</div>
+          </div>
+        </div>
+        <div class="priority-row">
+          <div class="p-num important">5</div>
+          <div class="p-body">
+            <span class="p-chip chip-important">Important</span>
+            <div class="p-title">Gaming limited to BGMI / FF</div>
+            <div class="p-desc">Amlan: "Don't limit to just mainstream games." Members want social deduction games, story modes, sandbox, simulation.</div>
+            <div class="p-action">→ Monthly Game of the Week rotation · Social deduction game nights (Among Us, Crab Game) · Shout out tournament winners publicly</div>
+          </div>
+        </div>
+        <div class="priority-row">
+          <div class="p-num important">6</div>
+          <div class="p-body">
+            <span class="p-chip chip-important">Important</span>
+            <div class="p-title">No YouTube / streaming presence</div>
+            <div class="p-desc">Punyashlok (3× mentions), Pupu, multiple OGs: start YouTube/Twitch. "Like Chaos Club." Huge discoverability opportunity.</div>
+            <div class="p-action">→ Pilot one Minecraft stream or podcast clip on YouTube · Recruit volunteer streamer · Start BPC YouTube — even 1 video is a start</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Watch — monitor</div>
+          <div class="priority-row">
+            <div class="p-num watch">7</div>
+            <div class="p-body">
+              <span class="p-chip chip-watch">Watch</span>
+              <div class="p-title">Content volume split</div>
+              <div class="p-desc">3 say too much, 3 say too little. Themed daily slots — Movie Mon, Music Tue — to organise the feed.</div>
+            </div>
+          </div>
+          <div class="priority-row">
+            <div class="p-num watch">8</div>
+            <div class="p-body">
+              <span class="p-chip chip-watch">Watch</span>
+              <div class="p-title">Offline events exclude remote members</div>
+              <div class="p-desc">Punyashlok: "Meetups me nhi ja pata 😿" — pair every offline event with a live stream.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Ideas — quick wins</div>
+          <div class="priority-row">
+            <div class="p-num idea">9</div>
+            <div class="p-body">
+              <span class="p-chip chip-idea">Idea</span>
+              <div class="p-title">Monthly community awards</div>
+              <div class="p-desc">Pidy: "Best Movie Reviewer, Biggest Cinephile." Kinjal: "Funniest, most chronically online, best music taste." Low effort, huge engagement.</div>
+            </div>
+          </div>
+          <div class="priority-row">
+            <div class="p-num idea">10</div>
+            <div class="p-body">
+              <span class="p-chip chip-idea">Idea</span>
+              <div class="p-title">Cosplay workshop with Pupu</div>
+              <div class="p-desc">"Odisha me koi cosplay nahi karta." Rishi: "Y'ALL DO COSPLAY!?" — strong community interest. Could be BPC's signature event.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMBER VOICES -->
+    <section class="section" id="tab-voices">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Member Voices</div>
+          <div class="page-subtitle">What members are actually saying</div>
+        </div>
+        <div class="date-chip">Qualitative insights</div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">What BPC absolutely nails</div>
+          <div class="quote-block"><div class="quote-text">Building a wonderful community where every fandom can be celebrated — kpop fan, anime, movies, comics — everyone belongs here.</div><div class="quote-author">— Shrie Mishra, OG member</div></div>
+          <div class="quote-block"><div class="quote-text">Relatability. Connecting with audience. The admins already know how to make people feel included.</div><div class="quote-author">— Amrit, 2 weeks–1 month</div></div>
+          <div class="quote-block"><div class="quote-text">The community has a very good vibe and everyone feels like home.</div><div class="quote-author">— Anonymous, OG member</div></div>
+          <div class="quote-block"><div class="quote-text">The admins are extremely friendly, plus the members also recommend great content.</div><div class="quote-author">— Amlan Jyoti Mansingh, new member</div></div>
+          <div class="quote-block"><div class="quote-text">Being relevant. GC is W.</div><div class="quote-author">— Swayaanshu Sarangi, OG member</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">What BPC needs to fix</div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">Consistency in almost everything.</div><div class="quote-author">— Anonymous, OG member</div></div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">Making newer members feel included faster 😭✌🏻</div><div class="quote-author">— Kinjal, just joined</div></div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">More attention to members and being active.</div><div class="quote-author">— Light Yagami, 2 weeks</div></div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">GROWTH. A more diverse community for each type of genre along with a common chat area.</div><div class="quote-author">— Swayaanshu / Sai Prem</div></div>
+          <div class="quote-block" style="border-left-color:#D85A30;"><div class="quote-text">Quality over quantity. Quality over quantity. (Said it twice.)</div><div class="quote-author">— Amrit, new member</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">What would make members contribute more?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="quote-block"><div class="quote-text">To talk more about Bollywood films, Indian influencers and all.</div><div class="quote-author">— Abhijeet Agrawal</div></div>
+          <div class="quote-block"><div class="quote-text">Inclusion. No one has asked me for anything so far.</div><div class="quote-author">— Pidy Piccaso</div></div>
+          <div class="quote-block"><div class="quote-text">More interactive events and conversations where newer members can jump in easily.</div><div class="quote-author">— Kinjal</div></div>
+          <div class="quote-block"><div class="quote-text">Proper equipment.</div><div class="quote-author">— Amrit</div></div>
+          <div class="quote-block"><div class="quote-text">ig its time for our BPC peeps to contribute (collaborating with us)</div><div class="quote-author">— Swayaanshu Sarangi</div></div>
+          <div class="quote-block"><div class="quote-text">Horror, dark and gore stuff.</div><div class="quote-author">— Purvansh, OG</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Wild ideas &amp; rants</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Start streaming in Twitch and YT the Minecraft thing — like Chaos Club (YT channel).</div><div class="quote-author">— Punyashlok Praharaj</div></div>
+          <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Host a Ronaldo vs Messi and RCB vs CSK debate competition.</div><div class="quote-author">— Purvansh</div></div>
+          <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Collab with OAC.</div><div class="quote-author">— Batman, OG member</div></div>
+          <div class="quote-block" style="border-left-color:#534AB7;"><div class="quote-text">Excellent community and members — just keep growing and scaling.</div><div class="quote-author">— Sarthak Mahapatra</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACTS -->
+    <section class="section" id="tab-contacts">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Member Contacts</div>
+          <div class="page-subtitle">Open to help organise · 11 reachable · 3 need follow-up</div>
+        </div>
+        <div class="date-chip">Handle with care</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Reachable members</div>
+
+        <div class="contact-row">
+          <div class="avatar">AA</div>
+          <div class="contact-body">
+            <div class="contact-name">Abhijeet Agrawal</div>
+            <div class="contact-tenure">OG member · 6+ months</div>
+            <div class="contact-detail">📞 9937060358</div>
+          </div>
+          <div class="contact-note">Willing to help</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">PP</div>
+          <div class="contact-body">
+            <div class="contact-name">Punyashlok Praharaj</div>
+            <div class="contact-tenure">OG member · 6+ months</div>
+            <div class="contact-detail">📞 8984153996 · 📧 punyashlokpraharaj@gmail.com · @__simply.prince__</div>
+          </div>
+          <div class="contact-note">Wants streaming/YT</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">PS</div>
+          <div class="contact-body">
+            <div class="contact-name">Priyanshu Saini</div>
+            <div class="contact-tenure">OG member · 6+ months</div>
+            <div class="contact-detail">📞 7978338972</div>
+          </div>
+          <div class="contact-note">BPC football match idea</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">AM</div>
+          <div class="contact-body">
+            <div class="contact-name">Amlan Jyoti Mansingh</div>
+            <div class="contact-tenure">New · 2 weeks – 1 month</div>
+            <div class="contact-detail">📞 9827396682</div>
+          </div>
+          <div class="contact-note">Active &amp; enthusiastic</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">PD</div>
+          <div class="contact-body">
+            <div class="contact-name">Priyam Das</div>
+            <div class="contact-tenure">3–6 months</div>
+            <div class="contact-detail">📞 7609865215 · @krxsh.xd_</div>
+          </div>
+          <div class="contact-note">Monthly contests idea</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">SM</div>
+          <div class="contact-body">
+            <div class="contact-name">Sarthak Mahapatra</div>
+            <div class="contact-tenure">1–3 months</div>
+            <div class="contact-detail">@sarthakmahx (Instagram)</div>
+          </div>
+          <div class="contact-note">Scaling &amp; monetisation</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">RE</div>
+          <div class="contact-body">
+            <div class="contact-name">Rishi / Eshan Rout</div>
+            <div class="contact-tenure">New · 2 weeks – 1 month</div>
+            <div class="contact-detail">@Nashedi.guitarist / @stfuEshan (Insta)</div>
+          </div>
+          <div class="contact-note">Super engaged new member</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">KJ</div>
+          <div class="contact-body">
+            <div class="contact-name">Kinjal</div>
+            <div class="contact-tenure">Just joined</div>
+            <div class="contact-detail">@kinju._.m (Instagram)</div>
+          </div>
+          <div class="contact-note">Monthly awards, new member events</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">LY</div>
+          <div class="contact-body">
+            <div class="contact-name">Light Yagami</div>
+            <div class="contact-tenure">2 weeks – 1 month</div>
+            <div class="contact-detail">📧 johnnyrandhawa12@gmail.com</div>
+          </div>
+          <div class="contact-note">Wants more engagement</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">AN</div>
+          <div class="contact-body">
+            <div class="contact-name">Aanya</div>
+            <div class="contact-tenure">1–3 months</div>
+            <div class="contact-detail">📞 8811019319 · 📧 aanyapoddar@gmail.com</div>
+          </div>
+          <div class="contact-note">FNAF lore nights, new member meets</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="avatar">IS</div>
+          <div class="contact-body">
+            <div class="contact-name">Ishika</div>
+            <div class="contact-tenure">1–3 months</div>
+            <div class="contact-detail">📞 9040069306</div>
+          </div>
+          <div class="contact-note">Wants engagement to post content</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Follow-up needed — no direct contact shared</div>
+
+        <div class="followup-row">
+          <div class="avatar" style="background:#FAEEDA;color:#854F0B;">PU</div>
+          <div class="contact-body">
+            <div class="contact-name">Pupu</div>
+            <div class="contact-tenure">OG member · 6+ months</div>
+            <div class="contact-detail">Said "Mujhe laga chota sa form hoga 😅" — no contact. Key for cosplay workshop.</div>
+          </div>
+          <div class="followup-badge">Reach via group DM</div>
+        </div>
+
+        <div class="followup-row">
+          <div class="avatar" style="background:#FAEEDA;color:#854F0B;">SH</div>
+          <div class="contact-body">
+            <div class="contact-name">Shrie Mishra</div>
+            <div class="contact-tenure">OG member · left for Hyderabad</div>
+            <div class="contact-detail">Said "in future sure" — follow up in a few weeks.</div>
+          </div>
+          <div class="followup-badge">Follow up in 2–3 weeks</div>
+        </div>
+
+        <div class="followup-row">
+          <div class="avatar" style="background:#FAEEDA;color:#854F0B;">SO</div>
+          <div class="contact-body">
+            <div class="contact-name">SOGGY</div>
+            <div class="contact-tenure">OG member · 6+ months</div>
+            <div class="contact-detail">Said "Yes, UKM" — no contact details provided.</div>
+          </div>
+          <div class="followup-badge">Reach via group</div>
+        </div>
+
+        <div style="margin-top:16px;padding:12px 16px;background:#EEEDFE;border-radius:10px;font-size:12px;color:#3C3489;">
+          <strong>Privacy tip:</strong> Always confirm with members before sharing details externally. Phone numbers were voluntarily submitted via the form.
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if (id === 'overview') drawActChart();
+  if (id === 'ratings') drawNpsChart();
+  if (id === 'events') drawAttChart();
+}
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y } } }
+};
+
+let actDrawn = false;
+function drawActChart() {
+  if (actDrawn) return; actDrawn = true;
+  new Chart(document.getElementById('actChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Core member', 'Regular (daily)', 'Casual (few/wk)', 'Lurker'],
+      datasets: [{
+        data: [5, 7, 12, 6],
+        backgroundColor: ['#534AB7', '#7F77DD', '#AFA9EC', '#CECBF6'],
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11, family: 'DM Sans' }, color: '#6B6B6B' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 3, font: { size: 11 }, color: '#6B6B6B' }, beginAtZero: true, max: 14 }
+      }
+    }
+  });
+}
+
+let npsDrawn = false;
+function drawNpsChart() {
+  if (npsDrawn) return; npsDrawn = true;
+  new Chart(document.getElementById('npsChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Score 1', 'Score 2', 'Score 3', 'Score 4', 'Score 5'],
+      datasets: [{
+        data: [0, 0, 1, 8, 21],
+        backgroundColor: ['#FCEBEB', '#F7C1C1', '#CECBF6', '#7F77DD', '#534AB7'],
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12, family: 'DM Sans' }, color: '#6B6B6B' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { stepSize: 5, font: { size: 11 }, color: '#6B6B6B' }, beginAtZero: true, max: 25 }
+      }
+    }
+  });
+}
+
+let attDrawn = false;
+function drawAttChart() {
+  if (attDrawn) return; attDrawn = true;
+  new Chart(document.getElementById('attChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Want to (not yet)', 'Attended once', 'Didn\'t know events existed', 'Attended multiple'],
+      datasets: [{
+        data: [14, 9, 4, 3],
+        backgroundColor: ['#534AB7', '#1D9E75', '#EEEDFE', '#AFA9EC'],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      cutout: '65%',
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+drawActChart();
+</script>
+</body>
+</html>
